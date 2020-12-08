@@ -1,14 +1,16 @@
-# The Power of Fractal Transformations
+# Combinators - Composable Transformations
 
 One of my favorite things about functional programming is the ability to work and think in a very localized area of code. Let's talk about some of the patterns that make that possible.
 
-I won't go into how immutability, managed effects, and no global variables helps us reason locally - although it really does! What I want to focus on here is the power of individual transformations composed together, as compared to making one big transformation.
+I won't go into how immutability, managed effects, or lack of global variables help us reason locally - although they really do! What I want to focus on here is the power of individual transformations composed together, as compared to making one big transformation, also known as a Combinator.
 
-## What is a Fractal Transformation?
+## What is a Combinator?
 
-The term Combinator is sometimes used to describe this concept. I'm using the term Fractal because I think that's a good visual metaphor. It's a transformation, built up of smaller transformations. The term Combinator is used because you can combine the smaller units to build up the whole.
+The term Combinator is used because you can combine the smaller units to build up the whole.
 
-It sounds complicated and hard to wrap your brain around, but once it clicks it feels natural. Much like thinking about recursion. "Define a function in terms of itself" sounds intimidating. Until you realize it's quite natural.
+A Combinator is the idea of building something up by combining small "base" values into more complex ones.
+
+It sounds complicated and hard to wrap your brain around, but once it clicks it feels natural. Much like thinking about recursion. "Define a function in terms of itself" sounds intimidating. Until you realize it's quite natural and declarative.
 
 ```elm
 fibonacci n =
@@ -18,36 +20,54 @@ fibonacci n =
     fibonacci ( n - 1 ) + fibonacci ( n - 1 )
 ```
 
-Fractal transformations are a similar concept. A transformation defined as either a core transformation, or a composition of transformations.
+This recursive definition turns out to be natural to understand because you can read it as _what_ a fibonacci number is (declarative), instead of _how_ it is calculated (imperative).
 
-For example, a simplified
+Recursion is a good analogy for Combinators:
+
+- A Combinator is declarative (not imperative)
+- A Combinator is either defined in terms of other Combinators (analagous to a recursive self-invocation), or it is a "base" combinator (analagous to a recursive base case)
+
+Let's look at an example with Elm. The `elm/json` library is how you turn untyped JSON data into typed Elm data types (or an `Err` `Result` value if the structure doesn't match).
 
 ```elm
-  Decode.map2 nameDecoder birthdayDecoder
+personDecoder : Decoder { name : String, birthday : Posix }
+    Decode.map2
+        (\name birthday -> { name = name, birthday = birthday })
+        nameDecoder
+        birthdayDecoder
 ```
 
-What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder. We're combining them.
+What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder. We're combining them. But at some point, we need to stop referring to other JSON Decoders and resolve to a "base" value.
+
+```elm
+nameDecoder =
+  Decode.field "full-name" Decode.string
+```
+
+`Decode.string` is going to resolve to some value. But we can compose Decoders together in more ways than just combining them or reading JSON values under a JSON property (like `"full-name"`).
+
+Another key technique for a Combinator is that we can transform them.
 
 ```elm
 birthdayDecoder =
   Decode.field "birthday-date-time" iso8601DateDecoder
 ```
 
-And so it continues, until we finally end up with a direct value.
+We follow the definitions, until we finally end up with a direct value.
 
 ```elm
 iso8601DateDecoder =
-  Decode.string
-  |> Decode.andThen (\dateTimeString ->
-    case iso8601StringToTime dateTimeString of
-      Ok time -> Decode.succeed time
-      Err error -> Decode.fail error
-  )
+    Decode.string
+        |> Decode.andThen (\dateTimeString ->
+        case iso8601StringToTime dateTimeString of
+            Ok time -> Decode.succeed time
+            Err error -> Decode.fail error
+        )
 ```
 
-What is an Elm JSON Decoder? It's either one of the core primitives (a String decoder, Int decoder, etc.), or it's a composition of the two.
+This time, we are transforming the raw String into an Elm `Time.Posix` value.
 
-Want to change the data type of part of it? Instead of reaching in to a list of lists within fields of a particular name in a JSON object (imperative), we can tweak the relevant decoder that we've composed and make the change locally.
+This feels like magic at first, much like recursion does the first time you encounter it. But once you get used to it, it becomes quite natural to define things declaratively this way. And there are some huge benefits to this approach when it comes to narrowing the scope of what you need to pull into your head to understand a section of code or make a change. In other words, localized reasoning.
 
 ## Thinking In Fractals Vs. Monoliths
 
