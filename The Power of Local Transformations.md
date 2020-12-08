@@ -1,8 +1,53 @@
 # The Power of Fractal Transformations
 
-One of my favorite things about functional programming is the ability to work and think in a very localized area of code. Let's talk about some of the patterns and tools that make that possible.
+One of my favorite things about functional programming is the ability to work and think in a very localized area of code. Let's talk about some of the patterns that make that possible.
 
-I won't go into how immutability, managed effects, and no global variables/environment helps us think more locally - although it really does! What I want to focus on here is how one little tool helps in terms of individual transformations composed together, rather than one big transformation: the map function.
+I won't go into how immutability, managed effects, and no global variables helps us reason locally - although it really does! What I want to focus on here is the power of individual transformations composed together, as compared to making one big transformation.
+
+## What is a Fractal Transformation?
+
+The term Combinator is sometimes used to describe this concept. I'm using the term Fractal because I think that's a good visual metaphor. It's a transformation, built up of smaller transformations. The term Combinator is used because you can combine the smaller units to build up the whole.
+
+It sounds complicated and hard to wrap your brain around, but once it clicks it feels natural. Much like thinking about recursion. "Define a function in terms of itself" sounds intimidating. Until you realize it's quite natural.
+
+```elm
+fibonacci n =
+  if n <= 1 then
+    n
+  else
+    fibonacci ( n - 1 ) + fibonacci ( n - 1 )
+```
+
+Fractal transformations are a similar concept. A transformation defined as either a core transformation, or a composition of transformations.
+
+For example, a simplified
+
+```elm
+  Decode.map2 nameDecoder birthdayDecoder
+```
+
+What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder. We're combining them.
+
+```elm
+birthdayDecoder =
+  Decode.field "birthday-date-time" iso8601DateDecoder
+```
+
+And so it continues, until we finally end up with a direct value.
+
+```elm
+iso8601DateDecoder =
+  Decode.string
+  |> Decode.andThen (\dateTimeString ->
+    case iso8601StringToTime dateTimeString of
+      Ok time -> Decode.succeed time
+      Err error -> Decode.fail error
+  )
+```
+
+What is an Elm JSON Decoder? It's either one of the core primitives (a String decoder, Int decoder, etc.), or it's a composition of the two.
+
+Want to change the data type of part of it? Instead of reaching in to a list of lists within fields of a particular name in a JSON object (imperative), we can tweak the relevant decoder that we've composed and make the change locally.
 
 ## Thinking In Fractals Vs. Monoliths
 
@@ -16,9 +61,47 @@ The challenge was that using that paradigm to normalize JSON data required think
 
 A Monolothic Transformation has you thinking top-down. With a Fractal Transformation, you think bottom-up.
 
-Working with this code in a functional language like Elm opens up a totally different paraidigm for doing these transformations. Using a JSON Decoder, we can flip this big transform function on its head and turn it into a series of small, localized transforms. Let's say, for example, that we need to filter out products that aren't within the specified price
+## Inverting the Monolothic Approach
 
-##
+Working with this code in a functional language like Elm opens up a totally different paraidigm for doing these transformations. Using a JSON Decoder, we can flip this big transform function on its head and turn it into a series of small, localized transforms.
+
+Let's say we are getting back some data from the server that we need to normalize. The first question is, where do we find the data? Once we've figured that out, we need to reach in and transform it in all the right places. If the data lives in a deeply nested field inside of an array of arrays inside of an object, then this can get quite tricky. We may be lucky and already have a function that is transforming some data in that area of the code, which we can then piggy back onto. Or it may not quite fit, in which case we need to find a new seam, transforming the data at every level starting from the top.
+
+Let's compare that to a more functional approach. Sometimes this pattern is called a Combinator.
+
+```elm
+fluffyColorOption : Jdec.Decoder FluffyColorOption
+fluffyColorOption =
+    Jpipe.decode FluffyColorOption
+        |> Jpipe.required "b" Jdec.float
+        |> Jpipe.required "g" Jdec.float
+        |> Jpipe.required "r" Jdec.float
+```
+
+This may seem like a small difference. Couldn't we just make this change by tweaking a function for normalizing that data, or creating a function in the right place?
+
+You can, but
+
+- You need to work your way down from the top first
+- These top-down changes tend to happen in multiple phases
+- Bottom-up transformations give you a frame where you have freedom to think locally
+
+## Fractal Transformations, Beyond JSON
+
+This pattern isn't specific to a language, like Elm, or a domain, like JSON.
+
+You can use these same concepts in TypeScript with a library like [`io-ts`](https://github.com/gcanti/io-ts). And you can apply this thinking to a lot more problems than JSON. Some examples in the Elm ecosystem:
+
+- Random number generators
+- elm/parser
+- Creating fuzzers (property-based test data)
+- elm-graphql
+
+## Next Post
+
+Thanks for reading! In the next post, I will share lessons learned about this technique and how it made me realize why I loved one type-safe library I built, and am now rebuilding another to learn these lessons a few years later.
+
+## TODO
 
 The most common example of mapping is mapping over a list. We have a List of User values, and we need to turn it into a List of user names. List.map User.userName users. This is great! But that's only scratching the surface.
 
