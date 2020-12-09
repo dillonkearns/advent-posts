@@ -35,7 +35,7 @@ personDecoder : Decoder { name : String, birthday : Posix }
         birthdayDecoder
 ```
 
-What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder.Did you notice that we're _combining_ two decoders? Pretty powerful!
+What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder. We're _combining_ them.
 
 But at some point, we need to refer to a Decoder that can directly resolve to a value (similar to our recursive "base case").
 
@@ -44,18 +44,20 @@ nameDecoder =
   Decode.field "full-name" Decode.string
 ```
 
-`Decode.string` is going to resolve to some value. But we can compose Decoders together in more ways than just combining them or reading JSON values under a JSON property (like `"full-name"`).
+`Decode.string` is going to resolve to some value. But we can compose Decoders together in more ways than just combining them or reading JSON values within a JSON property (like `"full-name"`).
 
 Another key technique for a Combinator is that we can transform them.
 
 ```elm
+birthdayDecoder : Decoder Time.Posix
 birthdayDecoder =
   Decode.field "birthday-date-time" iso8601DateDecoder
 ```
 
-We follow the definitions, until we finally end up with a direct value.
+If we follow the definitions, we finally end up with a direct "base" Decoder for `birthdayDecoder`.
 
 ```elm
+iso8601DateDecoder : Decoder Time.Posix
 iso8601DateDecoder =
     Decode.string
         |> Decode.andThen (\dateTimeString ->
@@ -67,7 +69,7 @@ iso8601DateDecoder =
 
 This time, we are transforming the raw String into an Elm `Time.Posix` value.
 
-This feels like magic at first, much like recursion does the first time you encounter it. But once you get used to it, it becomes quite natural to define things declaratively this way. And there are some huge benefits to this approach when it comes to narrowing the scope of what you need to pull into your head to understand a section of code or make a change. In other words, localized reasoning.
+This feels like magic at first, much like recursion does the first time you encounter it. But once you get used to it, it becomes quite natural to define things declaratively this way. And there are some huge benefits to this approach when it comes to narrowing the scope of what you need to pull into your head to understand a section of code or make a change. In other words, Combinators help localized reasoning.
 
 ## Top-Down Vs. Bottom-Up Transformations
 
