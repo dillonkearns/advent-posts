@@ -34,7 +34,7 @@ fibonacci n =
     fibonacci ( n - 1 ) + fibonacci ( n - 2 )
 ```
 
-This recursive definition can be read as _what_ a fibonacci number is (declarative), instead of _how_ it is calculated (imperative). It's pretty close to how you would teach fibonacci to a human. It just so happens that computers can understand it, too!
+This recursive definition can be read as _what_ a fibonacci number is (declarative), instead of _how_ it is calculated (imperative). No mention of _how_ to loop over in each iteration - it's simply written in terms of itself, like a math equation. It's pretty close to how you would teach fibonacci to a human. It just so happens that computers can understand it, too!
 
 Recursion is a good analogy for Combinators:
 
