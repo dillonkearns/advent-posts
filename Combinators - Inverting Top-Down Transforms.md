@@ -18,8 +18,6 @@ The challenge was that using that paradigm to normalize JSON data required think
 
 We weren't using TypeScript at the time, but even if we had been, the challenge would remain of having to navigate the structure from the top down in order to add a new transformation. Type-safety is a huge help, but it only gets you part of the way there to the benefits of localized reasoning.
 
-These top-down transformations require you to think of the data as a Monolith. In contrast, with Combinators you work bottom-up and you can think locally about a sub-problem.
-
 ## What is a Combinator?
 
 The term Combinator is used because you can _combine_ the smaller units to build up the whole. A Combinator is the idea of building something up by combining small "base" values into more complex ones. The values could be a JSON Decoder, a syntax parser, a random number generator. The key is that the simplest form can be composed together to build something complex - but (this is important) the simple thing and the complex thing are the same kind of thing!
@@ -57,8 +55,10 @@ What are `nameDecoder` and `birthdayDecoder`? They're both some kind of decoder.
 At some point, following our Decoder definitions we will find a Decoder that doesn't just compose Decoders, but directly resolves to a value (similar to our recursive "base case").
 
 ```elm
+nameDecoder : Decoder String
 nameDecoder =
-  Decode.field "full-name" Decode.string
+    Decode.string
+    |> Decode.field "full-name"
 ```
 
 `Decode.string` is going to resolve to some value. But we can compose Decoders together in more ways than just combining them or reading JSON values within a JSON property (like `"full-name"`).
@@ -87,6 +87,36 @@ iso8601DateDecoder =
 This time, we are transforming the raw String into an Elm `Time.Posix` value.
 
 This feels like magic at first, much like recursion does the first time you encounter it. But once you get used to it, it becomes quite natural to define things declaratively this way. And there are some huge benefits to this approach when it comes to narrowing the scope of what you need to pull into your head to understand a section of code or make a change. In other words, Combinators help localized reasoning.
+
+## Combinators are trees
+
+With the JS code where I was working with JSON from the server, I was working on the data top-down, and creating seams to transform data as needed. In contrast, with a Combinator you already have a place to work. A Combinator is built up at each level, and you can visualize it as a tree. You work bottom-up and you can think locally about a sub-problem. Each part is like a little box that you can work in. Once you find the right box, you don't need to worry about what's outside of that box, you can just focus on what's in the box you're changing. You don't need to create a new point to make your transformation, because it already exists. If we need to normalize names, we just find the right box and work within that.
+
+```elm
+nameDecoder : Decoder String
+nameDecoder =
+    Decode.string
+        |> Decode.map normalizeName
+        |> Decode.field "full-name"
+```
+
+Or if the name may have a different format, we just make that change within our box, blissfully unaware of the JSON structure above our box.
+
+```elm
+nameDecoder : Decoder String
+nameDecoder =
+    Decode.oneOf [ Decode.string, firstLastDecoder ]
+        |> Decode.field "full-name"
+        |> Decode.map normalizeName
+
+firstLastDecoder : Decoder String
+firstLastDecoder =
+    Decode.map2 (++)
+        (Decode.field "first")
+        (Decode.field "last")
+```
+
+Joël Quenneville has a nice visualization of this concept in his article [Elm's Universal Pattern](https://thoughtbot.com/blog/elms-universal-pattern).
 
 ## Inverting the Monolithic Top-Down Approach
 
