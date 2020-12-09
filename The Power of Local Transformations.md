@@ -25,7 +25,7 @@ Recursion is a good analogy for Combinators:
 - A Combinator is declarative (not imperative)
 - A Combinator is either defined in terms of other Combinators (analagous to a recursive self-invocation), or it is a "base" combinator (analagous to a recursive base case)
 
-Let's look at an example with Elm. The `elm/json` library is how you turn untyped JSON data into typed Elm data types (or an `Err` `Result` value if the structure doesn't match).
+Let's look at an example of a Combinator in Elm. The `elm/json` package is how you turn untyped JSON data into typed Elm data (or an `Err` `Result` value if the structure doesn't match).
 
 ```elm
 personDecoder : Decoder { name : String, birthday : Posix }
@@ -35,7 +35,9 @@ personDecoder : Decoder { name : String, birthday : Posix }
         birthdayDecoder
 ```
 
-What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder. We're combining them. But at some point, we need to stop referring to other JSON Decoders and resolve to a "base" value.
+What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder.Did you notice that we're _combining_ two decoders? Pretty powerful!
+
+But at some point, we need to refer to a Decoder that can directly resolve to a value (similar to our recursive "base case").
 
 ```elm
 nameDecoder =
