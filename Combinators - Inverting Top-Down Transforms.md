@@ -39,7 +39,7 @@ This recursive definition can be read as _what_ a fibonacci number is (declarati
 Recursion is a good analogy for Combinators:
 
 - A Combinator is declarative (not imperative)
-- A Combinator is either defined in terms of other Combinators (analogous to a recursive self-invocation), or it is a "base" combinator (analogous to a recursive base case)
+- A Combinator is either defined in terms of other Combinators (analagous to a recursive self-invocation), or it is a "base" combinator (analagous to a recursive base case)
 
 Let's look at an example of a Combinator in Elm. The `elm/json` package is how you turn untyped JSON data into typed Elm data (or an `Err` `Result` value if the structure doesn't match).
 
