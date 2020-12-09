@@ -22,7 +22,7 @@ These top-down transformations require you to think of the data as a Monolith. I
 
 ## What is a Combinator?
 
-The term Combinator is used because you can _combine_ the smaller units to build up the whole. A Combinator is the idea of building something up by combining small "base" values into more complex ones.
+The term Combinator is used because you can _combine_ the smaller units to build up the whole. A Combinator is the idea of building something up by combining small "base" values into more complex ones. The values could be a JSON Decoder, a syntax parser, a random number generator. The key is that the simplest form can be composed together to build something complex - but (this is important) the simple thing and the complex thing are the same kind of thing!
 
 It sounds complicated and hard to wrap your brain around, but once it clicks it feels natural. Much like thinking about recursion. "Define a function in terms of itself" sounds intimidating. Until you realize it's very declarative and readable to express things that way.
 
