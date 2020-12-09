@@ -37,12 +37,12 @@ This recursive definition can be read as _what_ a fibonacci number is (declarati
 Recursion is a good analogy for Combinators:
 
 - A Combinator is declarative (not imperative)
-- A Combinator is either defined in terms of other Combinators (analagous to a recursive self-invocation), or it is a "base" combinator (analagous to a recursive base case)
+- A Combinator is either defined in terms of other Combinators (analogous to a recursive self-invocation), or it is a "base" combinator (analogous to a recursive base case)
 
 Let's look at an example of a Combinator in Elm. The `elm/json` package is how you turn untyped JSON data into typed Elm data (or an `Err` `Result` value if the structure doesn't match).
 
 ```elm
-personDecoder : Decoder { name : String, birthday : Posix }
+personDecoder : Decoder { name : String, birthday : Time.Posix }
 personDecoder =
     Decode.map2
         (\name birthday -> { name = name, birthday = birthday })
@@ -50,15 +50,15 @@ personDecoder =
         birthdayDecoder
 ```
 
-What are `nameDecoder` and `birthdayDecoder`? They're both some kind of decoder. We're _combining_ them. Note that we can think about the decoders here at a high-level, and drop into the details as needed.
+What are `nameDecoder` and `birthdayDecoder`? They're both some kind of `Decoder`. We're _combining_ them. Note that we can think about the Decoders here at a high-level, and drop into the details as needed.
 
-At some point, following our Decoder definitions we will find a Decoder that doesn't just compose Decoders, but directly resolves to a value (similar to our recursive "base case").
+At some point, following our `Decoder` definitions we will find a `Decoder` that doesn't just compose Decoders, but directly resolves to a value (similar to our recursive "base case").
 
 ```elm
 nameDecoder : Decoder String
 nameDecoder =
     Decode.string
-    |> Decode.field "full-name"
+        |> Decode.field "full-name"
 ```
 
 `Decode.string` is going to resolve to some value. But we can compose Decoders together in more ways than just combining them or reading JSON values within a JSON property (like `"full-name"`).
@@ -90,7 +90,9 @@ This feels like magic at first, much like recursion does the first time you enco
 
 ## Combinators are trees
 
-With the JS code where I was working with JSON from the server, I was working on the data top-down, and creating seams to transform data as needed. In contrast, with a Combinator you already have a place to work. A Combinator is built up at each level, and you can visualize it as a tree. You work bottom-up and you can think locally about a sub-problem. Each part is like a little box that you can work in. Once you find the right box, you don't need to worry about what's outside of that box, you can just focus on what's in the box you're changing. You don't need to create a new point to make your transformation, because it already exists. If we need to normalize names, we just find the right box and work within that.
+With the JS code where I was working with JSON from the server, I was working on the data top-down, and carving out new "seams" to transform data as needed. In contrast, with a Combinator you already have a place to work. A Combinator is built up at each level, and you can visualize it as a tree. You work bottom-up and you can think locally about any sub-problem (think sub-tree). Each sub-problem is like a little box that you can work in. Once you find the right box, you don't need to worry about what's outside of that box, you can just focus on what's in the box you're changing. You don't need to create a new point to make your transformation, because it already exists.
+
+For example, if we need to normalize the names we're getting from the server, we just find the right box and work within that.
 
 ```elm
 nameDecoder : Decoder String
@@ -100,7 +102,7 @@ nameDecoder =
         |> Decode.field "full-name"
 ```
 
-Or if the name may have a different format, we just make that change within our box, blissfully unaware of the JSON structure above our box.
+Or if the name may have a different format, we just make that change within our box, blissfully unaware of the JSON structure surrounding our box.
 
 ```elm
 nameDecoder : Decoder String
@@ -118,19 +120,16 @@ firstLastDecoder =
 
 Joël Quenneville has a nice visualization of this concept in his article [Elm's Universal Pattern](https://thoughtbot.com/blog/elms-universal-pattern).
 
-## Inverting the Monolithic Top-Down Approach
+## Intermediary Data
 
-In summary, top-down, imperative transforms tend to:
-
-- Work their way down from the top first (rather than being able to start the change from the relevant sub-section)
-- Happen in multiple passes
+Another quality of transforming data in an imperative style is that it can happen in multiple passes. Each iteration to transform the data can give you an intermediary data format that isn't useful except as input to the next iteration of the transformation process.
 
 By using a Combinator, you can avoid passing data through various transformation stages, and instead only ever have the data in the desired form. The data is never exposed in your app in an intermediary format. Since you are building up both the JSON Decoder and its type information at the same type, you are guaranteed to either
 
 1. End up with well-typed data (happy path), or
 2. End up with a clear error
 
-This is a huge benefit for the Combinator pattern. This gives you explicit, clearly defined paths, with types fully describing the possibilites. Take a look at Alexis King's article [Parse, Don't Validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/) for some great insights about that.
+I really love this quality of the Combinator pattern. This gives you explicit, clearly defined paths, with types fully describing the possibilites. Take a look at Alexis King's article [Parse, Don't Validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/) for some great insights about that.
 
 ## Combinators Beyond JSON Decoders
 
