@@ -102,7 +102,7 @@ These are some of the basic building blocks of a Combinator. Let's explore how t
 
 ## Combinators are trees
 
-With the JS code where I was working with JSON from the server, I was working on the data top-down, and carving out new "seams" to transform data as needed. In contrast, with a Combinator you already have a place to work. A Combinator is built up at each level, and you can visualize it as a tree. You work bottom-up and you can think locally about any sub-problem (think sub-tree). Each sub-problem is like a little box that you can work in. Once you find the right box, you don't need to worry about what's outside of that box, you can just focus on what's in the box you're changing. You don't need to create a new point to make your transformation, because it already exists.
+With the JS code where I was working with JSON from the server, I was working on the data top-down, and carving out new "seams" to transform data as needed. In contrast, with a Combinator you already have a place to work. You can visualize a Combinator as a tree. You build up a complex Combinator from the bottom up, and you can think locally about any sub-problem (think sub-tree). Each sub-problem is like a little box that you can work in. Once you find the right box, you don't need to worry about what's outside of that box, you can just focus on what's inside the box you're working on. You don't need to create a new point to make your transformation, because it already exists.
 
 For example, if we need to normalize the names we're getting from the server, we just find the right box and work within that.
 
@@ -134,9 +134,11 @@ Joël Quenneville has a nice visualization of this concept in his article [Elm's
 
 ## Intermediary Data
 
-Another quality of transforming data in an imperative style is that it can happen in multiple passes. Each iteration to transform the data can give you an intermediary data format that isn't useful except as input to the next iteration of the transformation process.
+Another quality of transforming data in an imperative style is that it can happen in multiple passes. Each iteration to transform the data can yield an intermediary data format that isn't useful except as input to the next transformation phase.
 
-By using a Combinator, you can avoid passing data through various transformation stages, and instead only ever have the data in the desired form. The data is never exposed in your app in an intermediary format. Since you are building up both the JSON Decoder and its type information at the same type, you are guaranteed to either
+By using a Combinator, you can avoid passing data through various transformation stages. A Combinator represents a set of operations/transformations. You don't actually _use_ the Combinator until you've built it up. If you need to tweak something, you transform the Combinator. So the data is never exposed in your app in an intermediary format.
+
+In the case of a JSON Decoder, you are building up both the JSON Decoder and its type information at the same type, you are guaranteed to either
 
 1. End up with well-typed data (happy path), or
 2. End up with a clear error
