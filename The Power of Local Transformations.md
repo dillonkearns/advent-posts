@@ -83,36 +83,23 @@ The challenge was that using that paradigm to normalize JSON data required think
 
 We would sit in awe as the person most familiar with the codebase correctly traversed the nested arrays and objects to get to the exact right place and make a change on the first try. It was a lot to hold in our heads, and it was quite error prone.
 
-We weren't using TypeScript at the time, but even if we had been, the challenge would remain of having to navigate the structure from the top down in order to add a new transformation.
+We weren't using TypeScript at the time, but even if we had been, the challenge would remain of having to navigate the structure from the top down in order to add a new transformation. Type-safety is a huge help, but it only gets you part of the way there to the benefits of localized reasoning.
 
-These top-down transformations require you to think of the data as a Monolith. With a Combinators, you work bottom-up, and you can think locally.
+These top-down transformations require you to think of the data as a Monolith. In contrast, with Combinators you work bottom-up and you can think locally about a sub-problem.
 
 ## Inverting the Monolithic Top-Down Approach
 
-Working with this code in a functional language like Elm opens up a totally different paraidigm for doing these transformations. Using a JSON Decoder, we can flip this big transform function on its head and turn it into a series of small, localized transforms.
+In summary, top-down, imperative transforms tend to:
 
-Let's say we are getting back some data from the server that we need to normalize. With the top-down, monolothic transformation, the first question is how to find the right data in our data structure. Once we've figured that out, we need to reach in and transform it in all the right places. If the data lives in a deeply nested field inside of an array of arrays inside of an object, then this can get quite tricky. We may be lucky and already have a function that is transforming some data in that area of the code, which we can then piggy back onto. Or it may not quite fit, in which case we need to find a new seam, transforming the data at every level starting from the top.
+- Work their way down from the top first (rather than being able to start the change from the relevant sub-section)
+- Happen in multiple passes
 
-Let's compare that to a more functional, bottom-up approach.
+By using a Combinator, you can also avoid passing data through various transformation stages, and instead only ever have the data in the desired form. Since you are building up both the JSON Decoder and its type information at the same type, you are guaranteed to either
 
-Remember that our JSON Decoders are using the Combinator pattern, and a Combinator is composed of lots of smaller Combinators. Also, since it is a Combinator, it is declarative. So we don't have to think about _how_ it's transformed, just _what_ transformations are done. That means that we can go in and find the right insertion point.
+1. End up with well-typed data (happy path), or
+2. End up with a clear error
 
-```elm
-fluffyColorOption : Jdec.Decoder FluffyColorOption
-fluffyColorOption =
-    Jpipe.decode FluffyColorOption
-        |> Jpipe.required "b" Jdec.float
-        |> Jpipe.required "g" Jdec.float
-        |> Jpipe.required "r" Jdec.float
-```
-
-This may seem like a small difference. Couldn't we just make this change by tweaking a function for normalizing that data, or creating a function in the right place?
-
-You can, but
-
-- You need to work your way down from the top first
-- These top-down changes tend to happen in multiple phases
-- Bottom-up transformations give you a frame where you have freedom to think locally
+This is a huge benefit for the Combinator pattern. This gives you explicit, clearly defined paths, with types fully describing the possibilites. Take a look at Alexis King's article [Parse, Don't Validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/) for some great insights about that.
 
 ## Combinators Beyond JSON Decoders
 
@@ -120,10 +107,11 @@ This pattern isn't specific to a language, like Elm, or a domain, like JSON.
 
 You can use these same concepts in TypeScript with a library like [`io-ts`](https://github.com/gcanti/io-ts). And you can apply this thinking to a lot more problems than JSON. Some examples in the Elm ecosystem:
 
-- Random number generators
-- elm/parser
-- Creating fuzzers (property-based test data)
-- elm-graphql
+- [`elm/random`](https://package.elm-lang.org/packages/elm/random/latest/)
+- [`elm/parser`](https://package.elm-lang.org/packages/elm/parser/latest/)
+- Creating fuzzers (property-based test data) in [`elm/test`](https://package.elm-lang.org/packages/elm-explorations/test/latest/)
+- [`elm-graphql`](https://github.com/dillonkearns/elm-graphql)
+- [`elm-validate`](https://package.elm-lang.org/packages/rtfeldman/elm-validate/latest/)
 
 ## Next Post
 
