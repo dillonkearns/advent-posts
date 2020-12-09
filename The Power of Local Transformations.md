@@ -6,21 +6,19 @@ I won't go into how immutability, managed effects, or lack of global variables h
 
 ## What is a Combinator?
 
-The term Combinator is used because you can combine the smaller units to build up the whole.
+The term Combinator is used because you can _combine_ the smaller units to build up the whole. A Combinator is the idea of building something up by combining small "base" values into more complex ones.
 
-A Combinator is the idea of building something up by combining small "base" values into more complex ones.
-
-It sounds complicated and hard to wrap your brain around, but once it clicks it feels natural. Much like thinking about recursion. "Define a function in terms of itself" sounds intimidating. Until you realize it's quite natural and declarative.
+It sounds complicated and hard to wrap your brain around, but once it clicks it feels natural. Much like thinking about recursion. "Define a function in terms of itself" sounds intimidating. Until you realize it's very declarative and readable to express things that way.
 
 ```elm
 fibonacci n =
   if n <= 1 then
     n
   else
-    fibonacci ( n - 1 ) + fibonacci ( n - 1 )
+    fibonacci ( n - 1 ) + fibonacci ( n - 2 )
 ```
 
-This recursive definition turns out to be natural to understand because you can read it as _what_ a fibonacci number is (declarative), instead of _how_ it is calculated (imperative).
+This recursive definition can be read as _what_ a fibonacci number is (declarative), instead of _how_ it is calculated (imperative). It's pretty close to how you would teach fibonacci to a human. It just so happens that computers can understand it, too!
 
 Recursion is a good analogy for Combinators:
 
