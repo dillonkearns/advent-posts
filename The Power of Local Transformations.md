@@ -1,4 +1,4 @@
-# Combinators - Inverting Top-Down Monolothic Transforms
+# Combinators - Inverting Top-Down Transforms
 
 One of my favorite things about functional programming is the ability to work and think in a very localized area of code. Let's talk about some of the patterns that make that possible.
 
@@ -35,9 +35,9 @@ personDecoder : Decoder { name : String, birthday : Posix }
         birthdayDecoder
 ```
 
-What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder. We're _combining_ them.
+What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder. We're _combining_ them. Note that we can think about the decoders here at a high-level, and drop into the details as needed.
 
-But at some point, we need to refer to a Decoder that can directly resolve to a value (similar to our recursive "base case").
+At some point, following our Decoder definitions we will find a Decoder that doesn't just compose Decoders, but directly resolves to a value (similar to our recursive "base case").
 
 ```elm
 nameDecoder =
