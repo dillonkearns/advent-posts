@@ -45,13 +45,14 @@ Let's look at an example of a Combinator in Elm. The `elm/json` package is how y
 
 ```elm
 personDecoder : Decoder { name : String, birthday : Posix }
+personDecoder =
     Decode.map2
         (\name birthday -> { name = name, birthday = birthday })
         nameDecoder
         birthdayDecoder
 ```
 
-What are `nameDecoder` and `birthdayDecoder`? Some kind of decoder. We're _combining_ them. Note that we can think about the decoders here at a high-level, and drop into the details as needed.
+What are `nameDecoder` and `birthdayDecoder`? They're both some kind of decoder. We're _combining_ them. Note that we can think about the decoders here at a high-level, and drop into the details as needed.
 
 At some point, following our Decoder definitions we will find a Decoder that doesn't just compose Decoders, but directly resolves to a value (similar to our recursive "base case").
 
@@ -77,9 +78,9 @@ iso8601DateDecoder : Decoder Time.Posix
 iso8601DateDecoder =
     Decode.string
         |> Decode.andThen (\dateTimeString ->
-        case iso8601StringToTime dateTimeString of
-            Ok time -> Decode.succeed time
-            Err error -> Decode.fail error
+            case iso8601StringToTime dateTimeString of
+                Ok time -> Decode.succeed time
+                Err error -> Decode.fail error
         )
 ```
 
