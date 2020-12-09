@@ -94,7 +94,7 @@ In summary, top-down, imperative transforms tend to:
 - Work their way down from the top first (rather than being able to start the change from the relevant sub-section)
 - Happen in multiple passes
 
-By using a Combinator, you can also avoid passing data through various transformation stages, and instead only ever have the data in the desired form. Since you are building up both the JSON Decoder and its type information at the same type, you are guaranteed to either
+By using a Combinator, you can avoid passing data through various transformation stages, and instead only ever have the data in the desired form. The data is never exposed in your app in an intermediary format. Since you are building up both the JSON Decoder and its type information at the same type, you are guaranteed to either
 
 1. End up with well-typed data (happy path), or
 2. End up with a clear error
