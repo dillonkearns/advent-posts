@@ -42,17 +42,25 @@ Recursion is a good analogy for Combinators:
 Let's look at an example of a Combinator in Elm. The `elm/json` package is how you turn untyped JSON data into typed Elm data (or an `Err` `Result` value if the structure doesn't match).
 
 ```elm
-personDecoder : Decoder { name : String, birthday : Time.Posix }
+personDecoder :
+    Decoder
+        { name : String
+        , birthday : Time.Posix
+        }
 personDecoder =
     Decode.map2
-        (\name birthday -> { name = name, birthday = birthday })
+        (\name birthday ->
+            { name = name
+            , birthday = birthday
+            }
+        )
         nameDecoder
         birthdayDecoder
 ```
 
 What are `nameDecoder` and `birthdayDecoder`? They're both some kind of `Decoder`. We're _combining_ them. Note that we can think about the Decoders here at a high-level, and drop into the details as needed.
 
-At some point, following our `Decoder` definitions we will find a `Decoder` that doesn't just compose Decoders, but directly resolves to a value (similar to our recursive "base case").
+At some point, following our `Decoder` definitions we will find a `Decoder` that doesn't just compose Decoders, but directly resolves to a value (similar to our recursive **base case**).
 
 ```elm
 nameDecoder : Decoder String
@@ -77,16 +85,20 @@ If we follow the definitions, we finally end up with a direct "base" Decoder for
 iso8601DateDecoder : Decoder Time.Posix
 iso8601DateDecoder =
     Decode.string
-        |> Decode.andThen (\dateTimeString ->
-            case iso8601StringToTime dateTimeString of
-                Ok time -> Decode.succeed time
-                Err error -> Decode.fail error
-        )
+        |> Decode.andThen
+            (\dateTimeString ->
+                case iso8601StringToTime dateTimeString of
+                    Ok time ->
+                        Decode.succeed time
+
+                    Err error ->
+                        Decode.fail error
+            )
 ```
 
-This time, we are transforming the raw String into an Elm `Time.Posix` value.
+This time, we are transforming the raw String into an Elm `Time.Posix` value. `iso8601StringToTime` is a function that takes a `String` and gives a `Result String Time.Posix`. When we transform the "base" `Decoder` (`Decode.string`), the type changes with it.
 
-This feels like magic at first, much like recursion does the first time you encounter it. But once you get used to it, it becomes quite natural to define things declaratively this way. And there are some huge benefits to this approach when it comes to narrowing the scope of what you need to pull into your head to understand a section of code or make a change. In other words, Combinators help localized reasoning.
+These are some of the basic building blocks of a Combinator. Let's explore how these building blocks lend themselves to breaking down a problem into smaller pieces, without needing to pull in all the surrounding context.
 
 ## Combinators are trees
 
