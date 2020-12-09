@@ -1,8 +1,8 @@
-# Combinators - Composable Transformations
+# Combinators - Inverting Top-Down Monolothic Transforms
 
 One of my favorite things about functional programming is the ability to work and think in a very localized area of code. Let's talk about some of the patterns that make that possible.
 
-I won't go into how immutability, managed effects, or lack of global variables help us reason locally - although they really do! What I want to focus on here is the power of individual transformations composed together, as compared to making one big transformation, also known as a Combinator.
+I won't go into how immutability, managed effects, or lack of global variables help us reason locally - although they really do! What I want to focus on here is the power of individual transformations composed together, rather than making one big transformation. This concept is sometimes called a Combinator.
 
 ## What is a Combinator?
 
@@ -79,9 +79,9 @@ We had a lot of big unit tests to make sure things were working. Even so, it was
 
 The challenge was that using that paradigm to normalize JSON data required thinking of the data as a monolith. We certainly abstracted out functions to help with parts of the normalization. And we used lodash to do functional style mapping over the arrays of data and key-value objects. But mapping over arrays and objects only gets you part of the way there. We still needed to keep a map in our heads of the structure of the data so we could go into a specific area, traverse it, and change it.
 
-A Monolothic Transformation has you thinking top-down. With a Combinators, you think bottom-up.
+A Monolithic Transformation has you thinking top-down. With a Combinators, you think bottom-up.
 
-## Inverting the Monolothic Approach
+## Inverting the Monolithic Approach
 
 Working with this code in a functional language like Elm opens up a totally different paraidigm for doing these transformations. Using a JSON Decoder, we can flip this big transform function on its head and turn it into a series of small, localized transforms.
 
