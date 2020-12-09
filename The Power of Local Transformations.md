@@ -69,17 +69,17 @@ This time, we are transforming the raw String into an Elm `Time.Posix` value.
 
 This feels like magic at first, much like recursion does the first time you encounter it. But once you get used to it, it becomes quite natural to define things declaratively this way. And there are some huge benefits to this approach when it comes to narrowing the scope of what you need to pull into your head to understand a section of code or make a change. In other words, localized reasoning.
 
-## Thinking In Fractals Vs. Monoliths
+## Top-Down Vs. Bottom-Up Transformations
 
-In my JavaScript days, I remember many times when I was mapping over a big JS object, writing unit tests for a giant set of changes all made at once. I remember a specific case where we had a big list of data in the format defined by the server. We needed to take these products, pull out specific pieces of data, normalize them, and then apply the filters from the UI to show/hide certain items, and to sort them based on sorting options.
+In my JavaScript days, I remember many times when I was mapping over a big JS object, writing unit tests for a giant set of changes all made at once. I remember a specific case where we had a big list of data in a format defined by the server. We needed to take product listings, pull out specific options and inventory information, normalize them, and then apply filters from the UI to show/hide and sort search results.
 
-There were many nested fields, data could be null or not, and the options from one product line or another needed to be normalized differently.
+There were deeply nested fields and some incongruities to the shape of the data. Some values could be null or not. And there were a lot of transformations we needed to apply to normalize things.
 
 We had a lot of big unit tests to make sure things were working. Even so, it was so difficult to go in to our series of lodash function calls and find _where_ you needed to make a change. And once you did, you would want to make sure you added several new test cases to make sure you didn't miss a spot or mishandle a special case.
 
 The challenge was that using that paradigm to normalize JSON data required thinking of the data as a monolith. We certainly abstracted out functions to help with parts of the normalization. And we used lodash to do functional style mapping over the arrays of data and key-value objects. But mapping over arrays and objects only gets you part of the way there. We still needed to keep a map in our heads of the structure of the data so we could go into a specific area, traverse it, and change it.
 
-A Monolothic Transformation has you thinking top-down. With a Fractal Transformation, you think bottom-up.
+A Monolothic Transformation has you thinking top-down. With a Combinators, you think bottom-up.
 
 ## Inverting the Monolothic Approach
 
