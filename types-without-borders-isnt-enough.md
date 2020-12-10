@@ -25,7 +25,14 @@ You can learn more in the [Elm Guide's section on ports](https://guide.elm-lang.
 And in your app, you would call
 
 ```elm
-showModal { title = "Could not find that discount code", message = "Could not found discount code " ++ discountCode ++ ". Please try again.", style = "Warning" }
+showModal
+    { title = "Could not find that discount code"
+    , message =
+        "Could not found discount code "
+            ++ discountCode
+            ++ ". Please try again."
+    , style = "Warning"
+    }
 ```
 
 `elm-typescript-interop` takes that type information and generates TypeScript type definitions for setting up your Elm code. This is quite handy because it gives you
