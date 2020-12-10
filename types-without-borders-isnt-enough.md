@@ -64,10 +64,17 @@ So what that left you with was using `elm-typescript-interop` to be a serializat
 Let's take our example from above
 
 ```elm
-showModal { title = "Could not find that discount code", message = "Could not found discount code " ++ discountCode ++ ". Please try again.", style = "Warning" }
+showModal
+    { title = "Could not find that discount code"
+    , message =
+        "Could not found discount code "
+            ++ discountCode
+            ++ ". Please try again."
+    , style = "Warning"
+    }
 ```
 
-What if our ideal data type in Elm doesn't have that exact shape that we want to send to TypeScript?
+What if our ideal data type in Elm doesn't have that exact shape that we want to send to TypeScript? Let's say our ideal Elm type is this
 
 ```elm
 type ModalDialog
