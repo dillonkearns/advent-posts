@@ -99,9 +99,9 @@ modalDialogToPort modalDialog =
                 }
 ```
 
-We have the same limitation for building the desired format that our TypeScript code needs to consume. There are certain data types that we wouldn't be able to express with typed data that we can send through an Elm port, like a key-value object with dynamic keys.
+Just as we couldn't use our ideal data type in Elm because it used an advanced type that can't be automatically serialized, our ideal TypeScript type that we want to serialize to can't be expressed directly. We can't use expressive TypeScript types like [discriminated unions](https://basarat.gitbook.io/typescript/type-system/discriminated-unions).
 
-But specific limitations with data types that can't be serialized isn't the root problem. Regardless of those limitations, we can't assume that the data format needed in TypeScript and the ideal format in our Elm code are the same. So we need to transfer the data, while also transforming it. If you read yesterday's post, this may all ring a bell. You guessed it - it's time for a Combinator!
+But specific limitations with serializing to/from advanced data types isn't the root problem. Regardless of those limitations, we can't assume that the data format needed in TypeScript and the ideal format in our Elm code are the same. So we need to transfer the data, while also transforming it. If you read yesterday's post, this may all ring a bell. You guessed it - it's time for a Combinator!
 
 ## Getting the best of both worlds with Combinators
 
@@ -204,7 +204,7 @@ rawErrorEncoder =
 
 ```
 
-Just by writing this Elm code, we have the exact TypeScript type `type Event = Error | PageNavigation` that was our ideal TypeScript type! This allows us to express much more nuanced types between Elm and TypeScript (in this case we have a [TypeScript Discriminated Union](https://basarat.gitbook.io/typescript/type-system/discriminated-unions), for example). The type information from this `Encoder` is synced by running an `elm-ts-interop` command-line tool.
+Just by writing this Elm code, we have the exact TypeScript type `type Event = Error | PageNavigation` that was our ideal TypeScript type! This allows us to express much more nuanced types between Elm and TypeScript (in this case we have a TypeScript Discriminated Union, for example). The type information from this `Encoder` is synced by running an `elm-ts-interop` command-line tool.
 
 This `Encoder` does two things:
 
