@@ -52,7 +52,7 @@ People would often ask, "what's the best way to send your Elm Custom Types throu
 
 Initially, I thought that I would eventually come up with a way to automatically serialize Elm types, again by statically analyzing your Elm source code. Then you could serialize that data into TypeScript types automatically. I tried sketching out some design ideas, but never came up with anything that felt satisfying.
 
-So what that left you with was using elm-typescript-interop to be a serialization/de-serialization layer. But you would then need a second layer to convert that into proper Elm data.
+So what that left you with was using `elm-typescript-interop` to be a serialization/de-serialization layer. But you would then need a second layer to convert that into proper Elm data.
 
 Let's take our example from above
 
@@ -60,7 +60,7 @@ Let's take our example from above
 showModal { title = "Could not find that discount code", message = "Could not found discount code " ++ discountCode ++ ". Please try again.", style = "Warning" }
 ```
 
-What if our ideal data type in Elm doesn't have that exact shape that we want to send to TypeScript.
+What if our ideal data type in Elm doesn't have that exact shape that we want to send to TypeScript?
 
 ```elm
 type ModalDialog
@@ -81,7 +81,7 @@ modalDialogToPort modalDialog =
 
 We have the same limitation for building the desired format that our TypeScript code needs to consume. There are certain data types that we wouldn't be able to express with typed data that we can send through an Elm port, like a key-value object with dynamic keys.
 
-But those specific limitations with sending typed data through an Elm port aren't the key point. Regardless, we can't assume that the data formats needed in TypeScript and Elm are the same. So we need to transfer the data, while also transforming it. If you read yesterday's post, this may all ring a bell. You guessed it - it's time for a Combinator!
+But specific limitations with data types that can't be serialized isn't the root problem. Regardless of those limitations, we can't assume that the data format needed in TypeScript and the ideal format in our Elm code are the same. So we need to transfer the data, while also transforming it. If you read yesterday's post, this may all ring a bell. You guessed it - it's time for a Combinator!
 
 ## Getting the best of both worlds with Combinators
 
