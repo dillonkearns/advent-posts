@@ -214,10 +214,10 @@ That means instead of remembering to register each port, but getting no warning 
 app.ports.fromElm.subscribe((fromElm) => {
   switch (fromElm.tag) {
     case "reportEvent":
-      Bugsnag.notify(event);
+      AnalyticsService.notify(fromElm.data);
       break;
     case "scrollIntoView":
-      document.getElementById(fromElm.id)?.scrollIntoView(fromElm.options);
+      document.getElementById(fromElm.id)?.scrollIntoView(fromElm.data);
       break;
     // exhaustive check will fail if there are unhandled cases
   }
