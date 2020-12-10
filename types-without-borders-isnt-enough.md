@@ -101,21 +101,110 @@ But specific limitations with data types that can't be serialized isn't the root
 Let's say our ideal type that TypeScript would like to work with looks like this
 
 ```typescript
+type Event = Error | PageNavigation;
 type Error = {
+  kind: "Error";
   errorId?: string;
   message: string;
   context?: string;
 };
+
+type PageNavigation = {
+  kind: "PageNavigation";
+  path: string;
+};
 ```
 
-Our Encoder/Decoder now does a few things:
+Our `elm-ts-interop` `Encoder` would look something like this:
+
+```elm
+import Json.Encode as JE
+import TsInterop.Encode as Encode exposing (Encoder)
+
+
+type Event
+    = ErrorEvent Error
+    | PageNavigationEvent Url
+
+
+type alias Url =
+    { path : String }
+
+
+eventEncoder : Encoder Event
+eventEncoder =
+    Encode.union
+        (\vPageNavigation vError value ->
+            case value of
+                PageNavigationEvent url ->
+                    vPageNavigation url
+
+                ErrorEvent errorData ->
+                    vError errorData
+        )
+        |> Encode.variant pageNavigationEncoder
+        |> Encode.variant errorEncoder
+        |> Encode.buildUnion
+
+
+pageNavigationEncoder : Encoder Url
+pageNavigationEncoder =
+    Encode.object
+        [ Encode.required "kind" identity (Encode.literal <| JE.string "PageNavigation")
+        , Encode.required "path" .path Encode.string
+        ]
+
+
+errorEncoder : Encoder Error
+errorEncoder =
+    rawErrorEncoder
+        |> Encode.map
+            (\value ->
+                case value of
+                    FatalError errorCode ->
+                        { errorId = Just (errorCodeToString errorCode)
+                        , message = "Fatal error."
+                        , context = Nothing
+                        }
+
+                    Warning details ->
+                        { errorId = Nothing
+                        , message = details.message
+                        , context = Nothing
+                        }
+
+                    Info details ->
+                        { errorId = Nothing
+                        , message = details.message
+                        , context = Nothing
+                        }
+            )
+
+
+rawErrorEncoder :
+    Encoder
+        { errorId : Maybe String
+        , message : String
+        , context : Maybe String
+        }
+rawErrorEncoder =
+    Encode.object
+        [ Encode.optional "errorId" .errorId Encode.string
+        , Encode.required "message" .message Encode.string
+        , Encode.optional "context" .context Encode.string
+        , Encode.required "kind" identity (Encode.literal <| JE.string "Error")
+        ]
+
+```
+
+Just by writing this Elm code, we have the exact TypeScript type `type Event = Error | PageNavigation` that was our ideal TypeScript type! This allows us to express much more nuanced types between Elm and TypeScript (in this case we have a [TypeScript Discriminated Union](https://basarat.gitbook.io/typescript/type-system/discriminated-unions), for example). The type information from this `Encoder` is synced by running an `elm-ts-interop` command-line tool.
+
+This `Encoder` does two things:
 
 - Acts as an Adaptor to get the formats to line up (think American-to-European power adaptor)
 - Preserves type information on both sides as it does this!
 
-This is crucial. In building up the adaptor, the API builds up type information about what data it expects to come in, and what data types can go out.
-
-This is the missing piece from Types Without Borders! Why is this so important? There are several benefits:
+This is crucial. In building up the adaptor, the API builds up type information about what data it expects to come in, and what data types can go out. This is the missing piece from Types Without Borders! Why is this so important? There are several benefits:
 
 - We can express much more nuanced type information through this API
 - This is a Combinator, so we can build up very complex transformations by composing together easy-to-understand building blocks (see [yesterday's post on Combinators](https://functional.christmas/2020/10))
