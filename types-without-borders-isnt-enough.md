@@ -14,7 +14,7 @@ You define a port with a type annotation like this:
 
 ```elm
 -- this gives you a function to send a message to JavaScript
-showModal : { title : String, message : String, style : String } -> Cmd msg
+reportEvent : { title : String, message : String, kind : String } -> Cmd msg
 
 -- this gives you a subscription to listen for messages from JavaScript
 gotLocalStorage : ( { key : String, value : Json.Decode.Value } -> msg ) -> Sub msg
@@ -25,13 +25,10 @@ You can learn more in the [Elm Guide's section on ports](https://guide.elm-lang.
 And in your app, you would call
 
 ```elm
-showModal
+reportEvent
     { title = "Could not find that discount code"
-    , message =
-        "Could not found discount code "
-            ++ discountCode
-            ++ ". Please try again."
-    , style = "Warning"
+    , message = "Could not found discount code " ++ discountCode ++ "."
+    , kind = "Warning"
     }
 ```
 
@@ -46,8 +43,8 @@ Wiring up your ports looks something like this:
 ```js
 const app = Elm.Main.init({ flags: flagData });
 
-app.ports.showModal.subscribe(function (data) {
-  // show modal based on `data` we got from Elm
+app.ports.reportEvent.subscribe(function (data) {
+  // report event based on `data` we got from Elm
 });
 ```
 
@@ -64,38 +61,37 @@ So what that left you with was using `elm-typescript-interop` to be a serializat
 Let's take our example from above
 
 ```elm
-showModal
+reportEvent
     { title = "Could not find that discount code"
     , message =
         "Could not found discount code "
             ++ discountCode
             ++ ". Please try again."
-    , style = "Warning"
+    , kind = "Warning"
     }
 ```
 
 What if our ideal data type in Elm doesn't have that exact shape that we want to send to TypeScript? Let's say our ideal Elm type is this
 
 ```elm
-type ModalDialog
+type Error
   = FatalError ErrorCode
   | Warning { title : String, message : String }
-  | Info { title : String, message : String }
 ```
 
 Now we need a translation function to turn that data type into a format that our port can serialize.
 
 ```elm
-modalDialogToPort : ModalDialog -> Cmd msg
-modalDialogToPort modalDialog =
-    case modalDialog of
+reportElmErrorType : Error -> Cmd msg
+reportElmErrorType error =
+    case error of
         FatalError errorCode ->
-            showModal
+            reportEvent
                 { title = "Internal Error"
                 , message =
                     "Please contact support with code "
                         ++ errorCodeToString errorCode
-                , style = "Error"
+                , kind = "Error"
                 }
 ```
 
@@ -175,12 +171,6 @@ errorEncoder =
                         }
 
                     Warning details ->
-                        { errorId = Nothing
-                        , message = details.message
-                        , context = Nothing
-                        }
-
-                    Info details ->
                         { errorId = Nothing
                         , message = details.message
                         , context = Nothing
