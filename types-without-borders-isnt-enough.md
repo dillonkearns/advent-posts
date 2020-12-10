@@ -76,7 +76,13 @@ modalDialogToPort : ModalDialog -> Cmd msg
 modalDialogToPort modalDialog =
     case modalDialog of
         FatalError errorCode ->
-            showModal { title = "Internal Error", message = "Please contact support with code " ++ errorCodeToString errorCode, style = "Error" }
+            showModal
+                { title = "Internal Error"
+                , message =
+                    "Please contact support with code "
+                        ++ errorCodeToString errorCode
+                , style = "Error"
+                }
 ```
 
 We have the same limitation for building the desired format that our TypeScript code needs to consume. There are certain data types that we wouldn't be able to express with typed data that we can send through an Elm port, like a key-value object with dynamic keys.
