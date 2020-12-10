@@ -223,18 +223,13 @@ That means instead of remembering to register each port, but getting no warning 
 ```typescript
 app.ports.fromElm.subscribe((fromElm) => {
   switch (fromElm.tag) {
-    case "alert":
-      alert(fromElm.message);
-      break;
-    case "sendPresenceHeartbeat":
-      console.log("sendPresenceHeartbeat");
-      break;
-    case "bugsnag":
+    case "reportEvent":
       Bugsnag.notify(event);
       break;
     case "scrollIntoView":
       document.getElementById(fromElm.id)?.scrollIntoView(fromElm.options);
       break;
+    // exhaustive check will fail if there are unhandled cases
   }
 });
 ```
