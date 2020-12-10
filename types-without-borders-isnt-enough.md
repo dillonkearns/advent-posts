@@ -2,7 +2,7 @@
 
 At Elm Conf 2018, I gave a talk called Types Without Borders<sup>[^types-without-borders]</sup>. In the talk, I discussed the idea of preserving type information when crossing the boundary between languages or environments.
 
-I gave a demo of two different libraries that follow that principle: elm-graphql, and elm-typescript-interop. elm-graphql has stood the test of time quite well.
+I gave a demo of two different libraries that follow that principle: `elm-graphql`<sup>[^elm-graphql]</sup>, and `elm-typescript-interop`<sup>[^elm-typescript-interop]</sup>. elm-graphql has stood the test of time quite well.
 
 `elm-typescript-interop` was a solid idea at the time, but it missed something fundamentally that elm-graphql got right. So I'm rethinking it from scratch and introducing a new incarnation of that idea that I'm calling `elm-ts-interop`. In this post, I'll explore the missing piece, which needed a fresh look after a few years to discover: using a Combinator approach. I wrote about Combinators in-depth in yesterday's post, [Combinators - Inverting Top-Down Transforms](https://functional.christmas/2020/10). But first, let me describe the original approach of `elm-typescript-interop`.
 
@@ -84,3 +84,5 @@ But those specific limitations with sending typed data through an Elm port aren'
 
 [^data-interchange]: Evan Czaplicki's [vision for data interchange in Elm](https://gist.github.com/evancz/1c5f2cf34939336ecb79b97bb89d9da6).
 [^types-without-borders]: [Types Without Borders](https://www.youtube.com/watch?v=memIRXFSNkU) at Elm Conf 2018
+[^elm-graphql]: https://github.com/dillonkearns/elm-graphql
+[^elm-typescript-interop]: https://github.com/dillonkearns/elm-typescript-interop
