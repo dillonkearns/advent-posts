@@ -234,6 +234,10 @@ app.ports.fromElm.subscribe((fromElm) => {
 
 Again, this is because of the power of the Combinator pattern. Since a Combinator is just built up of other Combinators, we can build up very complex data serialization out of smaller pieces, and then _combine_ them into one type that's nice to work with in an exhaustive switch statement!
 
+## Sneak peak of elm-ts-interop
+
+Thanks for reading! I'll be releasing `elm-ts-interop` very soon, so stay tuned. If you want a sneak peak, you can browse this [preview of the documentation](https://elm-doc-preview.netlify.app/TsInterop-Encode?repo=dillonkearns%2Felm-ts-interop&version=main). I'd love to hear your thoughts. Let me know what you think on Twitter [@dillontkearns](https://twitter.com/dillontkearns)!
+
 [^data-interchange]: Evan Czaplicki's [vision for data interchange in Elm](https://gist.github.com/evancz/1c5f2cf34939336ecb79b97bb89d9da6).
 [^types-without-borders]: [Types Without Borders](https://www.youtube.com/watch?v=memIRXFSNkU) at Elm Conf 2018
 [^elm-graphql]: https://github.com/dillonkearns/elm-graphql
