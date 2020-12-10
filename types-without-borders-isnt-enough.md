@@ -1,22 +1,32 @@
+# Types Without Borders Isn't Enough
+
 At Elm Conf 2018, I gave a talk called Types Without Borders. In the talk, I discussed the idea of preserving type information when crossing the boundary between languages or environments.
 
 I gave a demo of two different libraries that follow that principle: elm-graphql, and elm-typescript-interop. elm-graphql has stood the test of time quite well.
 
-elm-typescript-interop was a solid idea at the time, but it missed something fundamentally that elm-graphql got right. So I'm rethinking it from scratch and introducing a new incarnation of that idea that I'm calling elm-ts-interop.
+`elm-typescript-interop` was a solid idea at the time, but it missed something fundamentally that elm-graphql got right. So I'm rethinking it from scratch and introducing a new incarnation of that idea that I'm calling `elm-ts-interop`. In this post, I'll explore the missing piece, which needed a fresh look after a few years to discover: using a Combinator approach. I wrote about Combinators in-depth in yesterday's post, [Combinators - Inverting Top-Down Transforms](https://functional.christmas/2020/10). But first, let me describe the original approach of `elm-typescript-interop`.
 
 ## The original elm-typescript-interop
 
-The idea of elm-typescript-interop is that it looks at your Elm source code and finds all the ports with their type information. In Elm, a port is a way to send messages to or from JavaScript. Since JavaScript doesn't have the same guarantees that Elm does, ports are a way to have an environment with sound types and no runtime exceptions. But you can still communicate with JavaScript, just by sending messages with the concept of the Actor Model - messages go out, messages come back. They are asyncronous.
+The idea of `elm-typescript-interop` is to look at your Elm source code and find all the ports and their type information. In Elm, a port is a way to send messages to or from JavaScript. Since JavaScript doesn't have the same guarantees that Elm does, ports are a way to have an environment with sound types and no runtime exceptions. But you can still communicate with JavaScript, just by sending messages with the concept of the Actor Model - messages can go out, and messages can come in.
 
-You can annotate your ports with type information, like this:
+You define a port with a type annotation like this:
 
+```elm
 showModal : { title : String, message : String, style : String } -> Cmd msg
+
+gotLocalStorage : ( { key : String, value : Json.Decode.Value } -> msg ) -> Sub msg
+```
+
+You can learn more in the [Elm Guide's section on ports](https://guide.elm-lang.org/interop/ports.html).
 
 And in your app, you would call
 
-showModal { title = "Could not find that discount code", message = "Could not found discount code " ++ discountCode ++ ". Please try again.", style = Warning |> styleToString }
+```elm
+showModal { title = "Could not find that discount code", message = "Could not found discount code " ++ discountCode ++ ". Please try again.", style = "Warning" }
+```
 
-elm-typescript-interop takes that type information and generates TypeScript type definitions for setting up your Elm code. This is quite handy because it gives you
+`elm-typescript-interop` takes that type information and generates TypeScript type definitions for setting up your Elm code. This is quite handy because it gives you
 
 - Intellisense for autocompletions when you wire up your ports in your JavaScript entrypoint
 - TypeScript errors if you pass in incorrect data
@@ -35,12 +45,41 @@ This all works as expected. In hindsight, this gives you type-safety, but it mis
 
 ## The problem with the original approach
 
-People would often ask, "what's the best way to send your Elm Custom Types through a port?"
+People would often ask, "what's the best way to send your Elm Custom Types through a port?" Elm automatically turns basic types through ports, like `String`, `Int`, records, lists, etc. And if you're wondering why Elm doesn't just automatically convert any type to JSON, Evan Czaplicki's document describing his vision<sup>[^data-interchange]</sup> for data interchange is worth a read.
 
-Initially, I thought that I would eventually come up with a way to automatically serialize Elm types, again by statically analyzing your Elm source code. Then you could serialize that data into TypeScript types automatically. I tried sketching out some design ideas, and never came up with anything that felt satisfying.
+Initially, I thought that I would eventually come up with a way to automatically serialize Elm types, again by statically analyzing your Elm source code. Then you could serialize that data into TypeScript types automatically. I tried sketching out some design ideas, but never came up with anything that felt satisfying.
 
 So what that left you with was using elm-typescript-interop to be a serialization/de-serialization layer. But you would then need a second layer to convert that into proper Elm data.
 
-TODO - example of converting a nice Elm custom type into automagically serializable Elm data.
+Let's take our example from above
 
-It needs a convert function.
+```elm
+showModal { title = "Could not find that discount code", message = "Could not found discount code " ++ discountCode ++ ". Please try again.", style = "Warning" }
+```
+
+What if our ideal data type in Elm doesn't have that exact shape that we want to send to TypeScript.
+
+```elm
+type ModalDialog
+  = FatalError ErrorCode
+  | Warning { title : String, message : String }
+  | Info { title : String, message : String }
+```
+
+Now we need a translation function to turn that data type into a format that our port can serialize.
+
+```elm
+modalDialogToPort : ModalDialog -> Cmd msg
+modalDialogToPort modalDialog =
+    case modalDialog of
+        FatalError errorCode ->
+            showModal { title = "Internal Error", message = "Please contact support with code " ++ errorCodeToString errorCode, style = "Error" }
+```
+
+We have the same limitation for building the desired format that our TypeScript code needs to consume. There are certain data types that we wouldn't be able to express with typed data that we can send through an Elm port, like a key-value object with dynamic keys.
+
+But those specific limitations with sending typed data through an Elm port aren't the key point. Regardless, we can't assume that the data formats needed in TypeScript and Elm are the same. So we need to transfer the data, while also transforming it. If you read yesterday's post, this may all ring a bell. You guessed it - it's time for a Combinator!
+
+## Getting the best of both worlds with Combinators
+
+[^data-interchange]: Evan Czaplicki's [vision for data interchange in Elm](https://gist.github.com/evancz/1c5f2cf34939336ecb79b97bb89d9da6).
