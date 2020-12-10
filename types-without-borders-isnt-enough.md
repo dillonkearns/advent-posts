@@ -13,8 +13,10 @@ The idea of `elm-typescript-interop` is to look at your Elm source code and find
 You define a port with a type annotation like this:
 
 ```elm
+-- this gives you a function to send a message to JavaScript
 showModal : { title : String, message : String, style : String } -> Cmd msg
 
+-- this gives you a subscription to listen for messages from JavaScript
 gotLocalStorage : ( { key : String, value : Json.Decode.Value } -> msg ) -> Sub msg
 ```
 
@@ -35,13 +37,14 @@ showModal { title = "Could not find that discount code", message = "Could not fo
 Wiring up your ports looks something like this:
 
 ```js
-const app = Elm.Main.init({flags: flagData})
+const app = Elm.Main.init({ flags: flagData });
 
-app.ports.showModal.subscribe(...)
-
+app.ports.showModal.subscribe(function (data) {
+  // show modal based on `data` we got from Elm
+});
 ```
 
-This all works as expected. In hindsight, this gives you type-safety, but it misses the bigger picture.
+`elm-typescript-interop` generates TypeScript declarations to bring some type-safety to this process. In hindsight, this type-safety is great, but the overall approach misses the bigger picture.
 
 ## The problem with the original approach
 
