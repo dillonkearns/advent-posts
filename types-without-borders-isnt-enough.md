@@ -85,6 +85,53 @@ But specific limitations with data types that can't be serialized isn't the root
 
 ## Getting the best of both worlds with Combinators
 
+Let's say our ideal type that TypeScript would like to work with looks like this
+
+```typescript
+type Error = {
+  errorId?: string;
+  message: string;
+  context?: string;
+};
+```
+
+Our Encoder/Decoder now does a few things:
+
+- Acts as an Adaptor to get the formats to line up (think American-to-European power adaptor)
+- Preserves type information on both sides as it does this!
+
+This is crucial. In building up the adaptor, the API builds up type information about what data it expects to come in, and what data types can go out.
+
+This is the missing piece from Types Without Borders! Why is this so important? There are several benefits:
+
+- We can express much more nuanced type information through this API
+- This is a Combinator, so we can build up very complex transformations by composing together easy-to-understand building blocks (see [yesterday's post on Combinators](https://functional.christmas/2020/10))
+
+Because of this new approach, we now have the added benefit that we can use a single Elm port to send all possible messages to TypeScript, and a single port to receive all messages from TypeScript.
+
+That means instead of remembering to register each port, but getting no warning if we forget one, we can use TypeScript to guarantee that we've handled every incoming message!
+
+```typescript
+app.ports.fromElm.subscribe((fromElm) => {
+  switch (fromElm.tag) {
+    case "alert":
+      alert(fromElm.message);
+      break;
+    case "sendPresenceHeartbeat":
+      console.log("sendPresenceHeartbeat");
+      break;
+    case "bugsnag":
+      Bugsnag.notify(event);
+      break;
+    case "scrollIntoView":
+      document.getElementById(fromElm.id)?.scrollIntoView(fromElm.options);
+      break;
+  }
+});
+```
+
+Again, this is because of the power of the Combinator pattern. Since a Combinator is just built up of other Combinators, we can build up very complex data serialization out of smaller pieces, and then _combine_ them into one type that's nice to work with in an exhaustive switch statement!
+
 [^data-interchange]: Evan Czaplicki's [vision for data interchange in Elm](https://gist.github.com/evancz/1c5f2cf34939336ecb79b97bb89d9da6).
 [^types-without-borders]: [Types Without Borders](https://www.youtube.com/watch?v=memIRXFSNkU) at Elm Conf 2018
 [^elm-graphql]: https://github.com/dillonkearns/elm-graphql
