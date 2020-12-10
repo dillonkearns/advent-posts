@@ -48,7 +48,7 @@ app.ports.showModal.subscribe(function (data) {
 
 ## The problem with the original approach
 
-People would often ask, "what's the best way to send your Elm Custom Types through a port?" Elm automatically turns basic types through ports, like `String`, `Int`, records, lists, etc. And if you're wondering why Elm doesn't just automatically convert any type to JSON, Evan Czaplicki's document describing his vision<sup>[^data-interchange]</sup> for data interchange is worth a read.
+People would often ask, "what's the best way to send your Elm Custom Types through a port?" Elm automatically sends basic types through ports, like `String`, `Int`, records, lists, etc. And if you're wondering why Elm doesn't just automatically convert any type to JSON, Evan Czaplicki's document describing his vision for data interchange<sup>[^data-interchange]</sup> is worth a read.
 
 Initially, I thought that I would eventually come up with a way to automatically serialize Elm types, again by statically analyzing your Elm source code. Then you could serialize that data into TypeScript types automatically. I tried sketching out some design ideas, but never came up with anything that felt satisfying.
 
