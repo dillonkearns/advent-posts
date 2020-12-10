@@ -1,10 +1,10 @@
 # Types Without Borders Isn't Enough
 
-At Elm Conf 2018, I gave a talk called Types Without Borders<sup>[^types-without-borders]</sup>. In the talk, I discussed the idea of preserving type information when crossing the boundary between languages or environments.
+At Elm Conf 2018, I gave a talk called [Types Without Borders](https://www.youtube.com/watch?v=memIRXFSNkU). In the talk, I discussed the idea of preserving type information when crossing the boundary between languages or environments.
 
-I gave a demo of two different libraries that follow that principle: `elm-graphql`<sup>[^elm-graphql]</sup>, and `elm-typescript-interop`<sup>[^elm-typescript-interop]</sup>. `elm-graphql` has stood the test of time quite well.
+I gave a demo of two different libraries that follow that principle: [`elm-graphql`](https://github.com/dillonkearns/elm-graphql), and [`elm-typescript-interop`](https://github.com/dillonkearns/elm-typescript-interop). `elm-graphql` has stood the test of time quite well.
 
-`elm-typescript-interop` was a solid idea at the time, but it missed something fundamentally that `elm-graphql` got right. So I'm rethinking it from scratch and introducing a new incarnation of that project that I'm, creatively, calling `elm-ts-interop`<sup>[^elm-ts-interop]</sup>. In this post, I'll explore the missing piece, which needed a fresh look after a few years to discover: using a Combinator approach. I wrote about Combinators in-depth in yesterday's post<sup>[^combinators-post]</sup>. Before I explain the new approach in `elm-ts-interop`, let me describe the original approach of `elm-typescript-interop`.
+`elm-typescript-interop` was a solid idea at the time, but it missed something fundamentally that `elm-graphql` got right. So I'm rethinking it from scratch and introducing a new incarnation of that project that I'm, creatively, calling [`elm-ts-interop`](https://github.com/dillonkearns/elm-ts-interop). In this post, I'll explore the missing piece, which needed a fresh look after a few years to discover: using a Combinator approach. I wrote about Combinators in-depth in [yesterday's post](https://functional.christmas/2020/10). Before I explain the new approach in `elm-ts-interop`, let me describe the original approach of `elm-typescript-interop`.
 
 ## The original elm-typescript-interop
 
@@ -55,7 +55,7 @@ app.ports.showModal.subscribe(function (data) {
 
 ## The problem with the original approach
 
-People would often ask, "what's the best way to send your Elm Custom Types through a port?" Elm automatically sends basic types through ports, like `String`, `Int`, records, lists, etc. And if you're wondering why Elm doesn't just automatically convert any type to JSON, Evan Czaplicki's document describing his vision for data interchange<sup>[^data-interchange]</sup> is worth a read.
+People would often ask, "what's the best way to send your Elm Custom Types through a port?" Elm automatically sends basic types through ports, like `String`, `Int`, records, lists, etc. And if you're wondering why Elm doesn't just automatically convert any type to JSON, Evan Czaplicki's document describing his [vision for data interchange](https://gist.github.com/evancz/1c5f2cf34939336ecb79b97bb89d9da6) is worth a read.
 
 Initially, I thought that I would eventually come up with a way to automatically serialize Elm types, again by statically analyzing your Elm source code. Then you could serialize that data into TypeScript types automatically. I tried sketching out some design ideas, but never came up with anything that felt satisfying.
 
@@ -237,10 +237,3 @@ Again, this is because of the power of the Combinator pattern. Since a Combinato
 ## Sneak peak of elm-ts-interop
 
 Thanks for reading! I'll be releasing `elm-ts-interop` very soon, so stay tuned. If you want a sneak peak, you can browse this [preview of the documentation](https://elm-doc-preview.netlify.app/TsInterop-Encode?repo=dillonkearns%2Felm-ts-interop&version=main). I'd love to hear your thoughts. Let me know what you think on Twitter [@dillontkearns](https://twitter.com/dillontkearns)!
-
-[^data-interchange]: Evan Czaplicki's [vision for data interchange in Elm](https://gist.github.com/evancz/1c5f2cf34939336ecb79b97bb89d9da6).
-[^types-without-borders]: [Types Without Borders](https://www.youtube.com/watch?v=memIRXFSNkU) at Elm Conf 2018
-[^elm-graphql]: https://github.com/dillonkearns/elm-graphql
-[^elm-typescript-interop]: https://github.com/dillonkearns/elm-typescript-interop
-[^elm-ts-interop]: https://github.com/dillonkearns/elm-ts-interop
-[^combinators-post]: [Combinators - Inverting Top-Down Transforms](https://functional.christmas/2020/10)
