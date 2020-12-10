@@ -239,8 +239,9 @@ app.ports.fromElm.subscribe((fromElm) => {
 });
 ```
 
-Again, this is because of the power of the Combinator pattern. Since a Combinator is just built up of other Combinators, we can build up very complex data serialization out of smaller pieces, and then _combine_ them into one type that's nice to work with in an exhaustive switch statement!
+Again, this is because of the power of the Combinator pattern. Since a Combinator is just built up of other Combinators, we can build up very complex data serialization out of smaller pieces, and then _combine_ them into one type that's nice to work with in an exhaustive switch statement<sup>[^exhaustive-switch]</sup>!
 
 ## Sneak peak of elm-ts-interop
 
 Thanks for reading! I'll be releasing `elm-ts-interop` very soon, so stay tuned. If you want a sneak peak, you can browse this [preview of the documentation](https://elm-doc-preview.netlify.app/TsInterop-Encode?repo=dillonkearns%2Felm-ts-interop&version=main). I'd love to hear your thoughts. Let me know what you think on Twitter [@dillontkearns](https://twitter.com/dillontkearns)!
+[^exhaustive-switch]: To make get errors if your switch statements are missing a case in TypeScript, you'll need to either use [this trick](https://stackoverflow.com/a/39419171), or use the [`@typescript-eslint/switch-exhaustiveness-check`](https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/switch-exhaustiveness-check.md) `eslint` rule.
