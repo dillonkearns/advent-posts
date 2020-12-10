@@ -1,6 +1,6 @@
 # Types Without Borders Isn't Enough
 
-At Elm Conf 2018, I gave a talk called Types Without Borders. In the talk, I discussed the idea of preserving type information when crossing the boundary between languages or environments.
+At Elm Conf 2018, I gave a talk called Types Without Borders<sup>[^types-without-borders]</sup>. In the talk, I discussed the idea of preserving type information when crossing the boundary between languages or environments.
 
 I gave a demo of two different libraries that follow that principle: elm-graphql, and elm-typescript-interop. elm-graphql has stood the test of time quite well.
 
@@ -83,3 +83,4 @@ But those specific limitations with sending typed data through an Elm port aren'
 ## Getting the best of both worlds with Combinators
 
 [^data-interchange]: Evan Czaplicki's [vision for data interchange in Elm](https://gist.github.com/evancz/1c5f2cf34939336ecb79b97bb89d9da6).
+[^types-without-borders]: [Types Without Borders](https://www.youtube.com/watch?v=memIRXFSNkU) at Elm Conf 2018
